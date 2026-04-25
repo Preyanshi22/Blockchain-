@@ -4,261 +4,410 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ArbiLearn | Blockchain Simulator</title>
-  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="page-transition">
   
-  <div class="ambient-glow glow-1"></div>
-  <div class="ambient-glow glow-2"></div>
-
-  <main class="container animate-fade-in" style="padding: 4rem 20px;">
-    
-    <div style="text-align: center; margin-bottom: 3rem;">
-      <h1 class="hero-title" style="font-size: 3rem;">Blockchain Mining <span class="text-gradient">Simulator</span></h1>
-      <p class="hero-subtitle">Experiment with hashes, nonces, and chain immutability. See firsthand how Proof-of-Work anchors data into an unchangeable chain.</p>
-    </div>
-
-    <!-- Global Chain Break Warning -->
-    <div id="global-warning" class="global-warning">
-      ⚠️ Chain Integrity Violated — A previous block was tampered with!
-    </div>
-
-    <div class="simulator-layout">
-      <!-- Main Blockchain Column -->
-      <div class="blockchain-container" id="chain-container">
-        <!-- Rendered blocks will appear here -->
+  <div class="hero-layered">
+    <div class="hero-scanline"></div>
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap: 2rem; position:relative; z-index:2;">
+      <div>
+        <div style="background: rgba(123,47,190,0.12); border: 1px solid rgba(123,47,190,0.3); padding: 6px 16px; border-radius: 50px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; display: inline-flex; align-items: center; color: var(--text-primary); margin-bottom: 12px;">
+          ⛏ PROOF OF WORK SIMULATOR
+        </div>
+        <h1 style="font-family: 'Space Grotesk'; font-weight: 700; font-size: clamp(2rem, 4vw, 3rem); background: linear-gradient(135deg, #F0F8FF 0%, #28A0F0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Blockchain Mining Simulator</h1>
+        <p style="font-family: 'Inter'; font-size: 0.95rem; color: var(--text-muted); margin-top: 10px;">Mine real SHA-256 hashes. Break the chain. Understand immutability.</p>
       </div>
-      
-      <!-- Educational Sidebar -->
-      <aside class="sidebar-panel glass-panel">
-        <h3 class="text-gradient" style="margin-bottom: 1.5rem; text-align: center;">How It Works</h3>
-        
-        <div class="tooltip-item">
-          <h4><i class="fa-solid fa-fingerprint"></i> What is SHA-256?</h4>
-          <p>A cryptographic hashing algorithm that takes any input data and generates a fixed-size 64-character hexadecimal string. Changing even one letter changes the entire output drastically.</p>
+      <div class="glass-card" style="display:inline-flex; gap:32px; padding: 1.5rem 2rem;">
+        <div style="display:flex; flex-direction:column;">
+          <span style="color:var(--text-muted); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Total Nonces</span>
+          <span id="glb-nonces" style="font-family:'Space Grotesk'; font-weight:600; font-size:1.1rem; color:white;">0</span>
         </div>
-        
-        <div class="tooltip-item">
-          <h4><i class="fa-solid fa-calculator"></i> What is a Nonce?</h4>
-          <p>A "Number used ONCE". In mining, it's the arbitrary number miners increment repeatedly to try and find a valid hash that starts with enough leading zeroes.</p>
+        <div style="width:1px; background:rgba(255,255,255,0.08);"></div>
+        <div style="display:flex; flex-direction:column;">
+          <span style="color:var(--text-muted); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Blocks Mined</span>
+          <span id="glb-blocks" style="font-family:'Space Grotesk'; font-weight:600; font-size:1.1rem; color:white;">0</span>
         </div>
-        
-        <div class="tooltip-item">
-          <h4><i class="fa-solid fa-link-slash"></i> Why does the chain break?</h4>
-          <p>Block 2 includes Block 1's Hash as part of its own calculation. If you alter Block 1, its hash changes. That change propagates immediately to Block 2's calculation, causing a mismatch and breaking the chain recursively.</p>
+        <div style="width:1px; background:rgba(255,255,255,0.08);"></div>
+        <div style="display:flex; flex-direction:column;">
+          <span style="color:var(--text-muted); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Chain Status</span>
+          <span id="glb-status" style="font-family:'Space Grotesk'; font-weight:600; font-size:1.1rem; color:var(--arb-green);">✓ VALID</span>
         </div>
-      </aside>
+      </div>
     </div>
+  </div>
 
-  </main>
+  <div class="controls-row" style="max-width:1100px;">
+    <div>
+      <span style="display:block; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); margin-bottom:8px;">Mining Difficulty</span>
+      <div style="display:flex; gap:10px;">
+        <button class="diff-pill active easy" data-diff="1" data-prefix="0">Easy</button>
+        <button class="diff-pill medium" data-diff="2" data-prefix="00">Medium</button>
+        <button class="diff-pill hard" data-diff="3" data-prefix="000">Hard</button>
+        <button class="diff-pill extreme" data-diff="4" data-prefix="0000">Extreme</button>
+      </div>
+      <div id="diff-target-txt" style="font-family:'JetBrains Mono'; font-size:0.85rem; color:var(--arb-cyan); margin-top:8px;">Target: Hash must start with → '0'</div>
+    </div>
+    
+    <button id="mine-all-btn" class="btn" style="background:linear-gradient(135deg, var(--arb-purple), var(--arb-blue)); box-shadow:var(--glow-purple); font-family:'Space Grotesk'; font-weight:700; font-size:1rem; padding:14px 36px; border-radius:50px; color:white; border:none; transition:var(--transition); cursor:pointer;">
+      ⛏ Mine All Blocks
+    </button>
+    
+    <div style="display:flex; flex-direction:column; align-items:flex-end;">
+      <button id="reset-chain-btn" class="btn btn-danger" style="padding:10px 20px; font-size:0.85rem;"><i class="fa-solid fa-arrow-rotate-left"></i> Reset Chain</button>
+      <div style="font-family:'JetBrains Mono'; font-size:0.75rem; color:var(--text-muted); margin-top:8px;">
+        Last Mine: <span id="last-mine-sec">--</span> | Avg Nonces: <span id="avg-nonces">--</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chain-layout" id="chain-container" style="margin-bottom:32rem;"></div>
+
+  <div id="chain-status-bar" class="chain-status-bar valid" style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:90%; z-index:100;">
+    <span class="pulse-dot-live" id="csb-dot"></span>
+    <span id="csb-title" style="font-family:'Space Grotesk'; font-weight:600; font-size:0.95rem; color:var(--arb-green); flex-shrink:0;">✓ Blockchain Integrity: VALID</span>
+    <span id="csb-desc" style="font-family:'Inter'; font-size:0.85rem; color:var(--text-muted); margin-left:auto;">All 3 blocks are properly linked and hashed</span>
+    <button id="csb-btn" class="btn btn-danger" style="display:none; padding:6px 12px; font-size:0.75rem;" onclick="mineBlock(1)"><i class="fa-solid fa-arrow-rotate-left"></i> Re-mine Block #1</button>
+  </div>
+
+  <div style="max-width:1100px; margin:32px auto 6rem; display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:24px; padding: 0 24px;">
+    <div class="glass-card" style="padding:20px;">
+      <i class="fa-solid fa-bullseye" style="font-size:2rem; color:var(--arb-cyan); margin-bottom:12px;"></i>
+      <h3 style="font-family:'Space Grotesk'; font-weight:600; font-size:0.95rem; color:white; margin-bottom:8px;">🎯 What is a Nonce?</h3>
+      <p style="font-family:'Inter'; font-size:0.85rem; color:var(--text-muted); line-height:1.6;">A nonce is a number miners increment until the block's hash meets the difficulty requirement. It's the 'trial and error' of proof-of-work.</p>
+    </div>
+    <div class="glass-card" style="padding:20px;">
+      <i class="fa-solid fa-lock" style="font-size:2rem; color:var(--arb-purple); margin-bottom:12px;"></i>
+      <h3 style="font-family:'Space Grotesk'; font-weight:600; font-size:0.95rem; color:white; margin-bottom:8px;">🔐 What is SHA-256?</h3>
+      <p style="font-family:'Inter'; font-size:0.85rem; color:var(--text-muted); line-height:1.6;">SHA-256 converts any input into a fixed 64-character output. Change even one character of input and the entire output changes completely.</p>
+    </div>
+    <div class="glass-card" style="padding:20px;">
+      <i class="fa-solid fa-link-slash" style="font-size:2rem; color:var(--arb-red); margin-bottom:12px;"></i>
+      <h3 style="font-family:'Space Grotesk'; font-weight:600; font-size:0.95rem; color:white; margin-bottom:8px;">⛓️ Why Does the Chain Break?</h3>
+      <p style="font-family:'Inter'; font-size:0.85rem; color:var(--text-muted); line-height:1.6;">Each block stores the previous block's hash. Changing Block 1 changes its hash, which no longer matches what Block 2 stored — breaking the link.</p>
+    </div>
+  </div>
 
   <script src="navbar.js"></script>
   <script>
     loadLayout('simulator');
 
-    /**
-     * Simulator Logic
-     */
-     
-    const chainContainer = document.getElementById('chain-container');
-    const globalWarning = document.getElementById('global-warning');
+    let difficultyPrefix = "0";
+    let isGlobalBroken = false;
+    let totalNonces = 0;
+    let totalMined = 0;
+    let mineTimes = [];
+    let nonceRecords = [];
 
-    // State management for blocks
-    const chain = [
-      { id: 1, nonce: 72608, data: "Genesis Block - Arbitrum Foundation", prevHash: "0000000000000000000000000000000000000000000000000000000000000000", hash: "" },
-      { id: 2, nonce: 83291, data: "Alice sends 5 ETH to Bob\nBob sends 2 ETH to Charlie", prevHash: "", hash: "" },
-      { id: 3, nonce: 12903, data: "Charlie deploys Smart Contract 0x9f...", prevHash: "", hash: "" }
+    const INITIAL_CHAIN = [
+      { id: 1, nonce: 72608, data: "Genesis Block - Arbitrum Foundation", computedPrevHash: "0000000000000000000000000000000000000000000000000000000000000000" },
+      { id: 2, nonce: 83291, data: "Alice sends 5 ETH to Bob\nBob sends 2 ETH to Charlie", computedPrevHash: "" },
+      { id: 3, nonce: 12903, data: "Charlie deploys Smart Contract 0x9f...", computedPrevHash: "" }
     ];
+    let chain = JSON.parse(JSON.stringify(INITIAL_CHAIN));
 
-    // SHA-256 implementation using Web Crypto API
-    async function calculateHash(blockNumber, nonce, data, prevHash) {
-      const message = `${blockNumber}${nonce}${data}${prevHash}`;
-      const msgBuffer = new TextEncoder().encode(message);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    async function sha256(msg) {
+      const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+      return Array.from(new Uint8Array(buffer)).map(b=>b.toString(16).padStart(2,'0')).join('');
     }
 
-    // Helper: Delay to yield UI updates (animates counting visually)
-    const delay = (ms) => new Promise(res => setTimeout(res, ms));
+    const genConnector = (isValid) => {
+      if(isValid) {
+        return `
+          <svg width="60" height="40" viewBox="0 0 60 40">
+            <line x1="0" y1="20" x2="60" y2="20" stroke="rgba(40,160,240,0.4)" stroke-width="2"/>
+            <ellipse cx="20" cy="20" rx="8" ry="5" fill="none" stroke="var(--arb-blue)" stroke-width="1.5" style="animation: cpulse 2s infinite"/>
+            <ellipse cx="30" cy="20" rx="8" ry="5" fill="none" stroke="var(--arb-blue)" stroke-width="1.5" style="animation: cpulse 2s infinite 0.3s"/>
+            <ellipse cx="40" cy="20" rx="8" ry="5" fill="none" stroke="var(--arb-blue)" stroke-width="1.5" style="animation: cpulse 2s infinite 0.6s"/>
+            <polygon points="56,16 60,20 56,24" fill="var(--arb-blue)"/>
+            <style>@keyframes cpulse{0%,100%{opacity:0.6}50%{opacity:1}}</style>
+          </svg>
+        `;
+      } else {
+        return `
+          <div style="animation: shake 0.4s ease;">
+            <svg width="60" height="40" viewBox="0 0 60 40">
+              <line x1="0" y1="20" x2="25" y2="20" stroke="rgba(255,69,96,0.6)" stroke-width="2"/>
+              <line x1="35" y1="20" x2="60" y2="20" stroke="rgba(255,69,96,0.6)" stroke-width="2"/>
+              <ellipse cx="16" cy="20" rx="8" ry="5" fill="none" stroke="var(--arb-red)" stroke-width="1.5" transform="rotate(-15 16 20)"/>
+              <ellipse cx="44" cy="20" rx="8" ry="5" fill="none" stroke="var(--arb-red)" stroke-width="1.5" transform="rotate(15 44 20)"/>
+              <path d="M 28 15 L 30 20 L 26 21 L 32 25" fill="none" stroke="var(--arb-red)" stroke-width="1.5"/>
+            </svg>
+          </div>
+        `;
+      }
+    };
 
-    // Render the chain layout into the DOM once
-    function initializeDOM() {
-      chainContainer.innerHTML = '';
+    const buildDOM = () => {
+      const cc = document.getElementById('chain-container');
+      cc.innerHTML = '';
       
-      chain.forEach((block, index) => {
-        // Build card HTML
-        const cardHTML = `
-          <div class="glass-panel block-card" id="block-${block.id}">
+      for(let i=0; i<chain.length; i++) {
+        cc.innerHTML += `
+          <div class="block-card" id="card-${chain[i].id}">
             <div class="block-header">
-              <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif;">Block #${block.id}</h3>
-              <span class="status-badge" id="status-${block.id}">...</span>
+              <div style="font-family:'Space Grotesk'; font-weight:700; color:white; font-size:0.95rem;">Block #${chain[i].id}</div>
+              <div id="stat-${chain[i].id}" style="background:rgba(0,255,148,0.1); border:1px solid rgba(0,255,148,0.3); border-radius:6px; padding:3px 10px; font-family:'Space Grotesk'; font-size:0.7rem; color:var(--arb-green); transition:0.3s;">🔒 Valid</div>
             </div>
-            
-            <div class="form-group">
-              <label>Block Data:</label>
-              <textarea class="form-control" id="data-${block.id}">${block.data}</textarea>
-            </div>
-            
-            <div class="form-group">
-              <label>Previous Hash:</label>
-              <input type="text" class="form-control" id="prevHash-${block.id}" value="${block.prevHash}" readonly ${block.id === 1 ? 'disabled' : ''}>
-            </div>
-            
-            <div class="form-group">
-              <label>Current Hash:</label>
-              <input type="text" class="form-control" id="hash-${block.id}" value="" readonly style="font-weight: bold; background: rgba(0,0,0,0.5);">
-            </div>
-            
-            <div class="form-group" style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 0;">
-              <div style="flex: 1;">
-                <label>Nonce:</label>
-                <input type="number" class="form-control" id="nonce-${block.id}" value="${block.nonce}">
+            <div style="padding:20px;">
+              
+              <div style="display:flex; justify-content:space-between;">
+                <label style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted);">Block Data:</label>
+                <span class="tooltip-icon">ⓘ<div class="tooltip-bubble">The information stored in this block. Changing this invalidates the block's hash.</div></span>
               </div>
-              <button class="btn btn-primary" id="mine-btn-${block.id}">
-                <i class="fa-solid fa-hammer"></i> Mine Block
-              </button>
+              <textarea id="data-${chain[i].id}" class="block-textarea">${chain[i].data}</textarea>
+
+              <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <label style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted);">Nonce:</label>
+                <span class="tooltip-icon">ⓘ<div class="tooltip-bubble">Number Only Used Once. Incremented until a valid hash is found.</div></span>
+              </div>
+              <input type="number" id="nonce-${chain[i].id}" class="block-input-ro" style="color:var(--arb-cyan);" value="${chain[i].nonce}" readonly>
+
+              <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <label style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted);">Prev Hash:</label>
+                <span class="tooltip-icon">ⓘ<div class="tooltip-bubble">The hash of the previous block. This links blocks together into a chain.</div></span>
+              </div>
+              <input type="text" id="prev-${chain[i].id}" class="block-input-ro" style="color:var(--text-muted);" value="${chain[i].computedPrevHash}" readonly>
+
+              <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <label style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted);">Hash:</label>
+                <span class="tooltip-icon">ⓘ<div class="tooltip-bubble">The SHA-256 hash of all block data combined. Must start with the target prefix to be valid.</div></span>
+              </div>
+              <div id="hash-${chain[i].id}" class="hash-display valid"></div>
+
+              <div class="mining-progress-wrapper" id="progwrap-${chain[i].id}">
+                <div class="mining-progress-fill" id="progfill-${chain[i].id}"></div>
+              </div>
+
+              <button class="mine-btn default" id="btn-${chain[i].id}" onclick="mineBlock(${chain[i].id})">⛏ Mine Block #${chain[i].id}</button>
+              
+              <div id="minestat-${chain[i].id}" style="font-family:'JetBrains Mono'; font-size:0.72rem; color:var(--text-muted); text-align:center; margin-top:8px; opacity:0; transition:0.3s;">
+                ⏱ Time: --s | 🔢 Nonces: -- | ⚡ Rate: --/s
+              </div>
             </div>
           </div>
         `;
         
-        chainContainer.insertAdjacentHTML('beforeend', cardHTML);
-        
-        // Add arrow between cards
-        if (index < chain.length - 1) {
-          chainContainer.insertAdjacentHTML('beforeend', `<div class="chain-arrow"><i class="fa-solid fa-arrow-down-long"></i></div>`);
+        if (i < chain.length - 1) {
+          cc.innerHTML += `<div class="chain-connector-box" id="conn-${chain[i].id}">${genConnector(true)}</div>`;
         }
+      }
+
+      chain.forEach(b => {
+        document.getElementById(`data-${b.id}`).addEventListener('input', () => {
+          b.data = document.getElementById(`data-${b.id}`).value;
+          updateNetwork();
+        });
       });
+    };
 
-      // Bind dynamic input listeners
-      chain.forEach(block => {
-        const inputData = document.getElementById(`data-${block.id}`);
-        const inputNonce = document.getElementById(`nonce-${block.id}`);
-        const btnMine = document.getElementById(`mine-btn-${block.id}`);
-
-        const refreshTrigger = () => {
-          // Update internal state exactly to UI values
-          chain[block.id - 1].data = inputData.value;
-          chain[block.id - 1].nonce = parseInt(inputNonce.value) || 0;
-          recalculateChain(); 
-        };
-
-        inputData.addEventListener('input', refreshTrigger);
-        inputNonce.addEventListener('input', refreshTrigger);
-        btnMine.addEventListener('click', () => mineBlock(block.id));
-      });
-    }
-
-    // Live update function triggered on any keystroke or mining completion
-    async function recalculateChain() {
-      let isBroken = false;
+    const updateNetwork = async () => {
+      let isBrokenCascade = false;
 
       for (let i = 0; i < chain.length; i++) {
-        // If not block 1, previous hash is strictly forcing dependency on (i-1)'s hash output
         if (i > 0) {
-          chain[i].prevHash = chain[i-1].hash;
-          document.getElementById(`prevHash-${chain[i].id}`).value = chain[i].prevHash;
+          chain[i].computedPrevHash = chain[i-1].hash;
+          document.getElementById(`prev-${chain[i].id}`).value = chain[i].computedPrevHash;
         }
 
-        // Generate the new hash directly corresponding to memory state
-        const newHash = await calculateHash(chain[i].id, chain[i].nonce, chain[i].data, chain[i].prevHash);
-        chain[i].hash = newHash;
+        const msg = `${chain[i].id}${chain[i].nonce}${chain[i].data}${chain[i].computedPrevHash}`;
+        chain[i].hash = await sha256(msg);
 
-        // Visual DOM updates
-        const cardUI = document.getElementById(`block-${chain[i].id}`);
-        const hashUI = document.getElementById(`hash-${chain[i].id}`);
-        const statusUI = document.getElementById(`status-${chain[i].id}`);
+        const localValid = chain[i].hash.startsWith(difficultyPrefix);
+        const card = document.getElementById(`card-${chain[i].id}`);
+        const stat = document.getElementById(`stat-${chain[i].id}`);
+        const hashd = document.getElementById(`hash-${chain[i].id}`);
+        const prevInp = document.getElementById(`prev-${chain[i].id}`);
 
-        hashUI.value = newHash;
-
-        // Validity rule: valid if it starts with '00' (difficulty requirement for simulation)
-        // AND not inheriting a broken chain state
-        const localValid = newHash.startsWith('00');
-        
-        if (localValid && !isBroken) {
-          cardUI.classList.remove('block-invalid');
-          cardUI.classList.add('block-valid');
-          statusUI.className = 'status-badge status-valid';
-          statusUI.innerHTML = '✅ Block Valid';
+        if (localValid && !isBrokenCascade) {
+          card.classList.remove('invalid');
+          stat.innerHTML = '🔒 Valid';
+          stat.style.background = 'rgba(0,255,148,0.1)'; stat.style.color = 'var(--arb-green)'; stat.style.borderColor = 'rgba(0,255,148,0.3)';
+          hashd.className = 'hash-display valid';
+          
+          const prefix = chain[i].hash.substring(0, difficultyPrefix.length);
+          const rem = chain[i].hash.substring(difficultyPrefix.length);
+          hashd.innerHTML = `<span style="background:rgba(0,255,148,0.15); color:var(--arb-green); border-radius:3px; padding:0 2px;">${prefix}</span>${rem}`;
+          
+          if(i>0) {
+            prevInp.style.color = 'var(--text-muted)'; prevInp.style.borderColor = 'rgba(255,255,255,0.06)';
+            document.getElementById(`conn-${chain[i-1].id}`).innerHTML = genConnector(true);
+          }
         } else {
-          // Cascade breaker
-          isBroken = true; 
-          cardUI.classList.remove('block-valid');
-          cardUI.classList.add('block-invalid');
-          statusUI.className = 'status-badge status-invalid';
-          statusUI.innerHTML = '❌ Block Invalid';
+          isBrokenCascade = true;
+          if(i>0) document.getElementById(`conn-${chain[i-1].id}`).innerHTML = genConnector(false);
+          card.classList.add('invalid');
+          stat.innerHTML = '🔓 Invalid';
+          stat.style.background = 'rgba(255,69,96,0.1)'; stat.style.color = 'var(--arb-red)'; stat.style.borderColor = 'rgba(255,69,96,0.3)';
+          hashd.className = 'hash-display invalid';
+          hashd.innerHTML = chain[i].hash;
+          if(i>0 && !localValid) prevInp.style.color = 'var(--text-muted)';
+          else if(i>0) { prevInp.style.color = 'var(--arb-red)'; prevInp.style.borderColor = 'rgba(255,69,96,0.3)'; }
         }
       }
 
-      // Display global warning if broken chain logic tripped (at least one valid node was broken)
-      globalWarning.style.display = isBroken ? 'block' : 'none';
-    }
+      const csb = document.getElementById('chain-status-bar');
+      const csbTitle = document.getElementById('csb-title');
+      const csbDesc = document.getElementById('csb-desc');
+      const csbDot = document.getElementById('csb-dot');
+      const csbBtn = document.getElementById('csb-btn');
 
-    // Start mining simulation for a specific block
-    async function mineBlock(id) {
-      const blockIndex = id - 1;
-      const targetBlock = chain[blockIndex];
-      const cardUI = document.getElementById(`block-${id}`);
-      const nonceUI = document.getElementById(`nonce-${id}`);
-      const btnMine = document.getElementById(`mine-btn-${id}`);
-      const hashUI = document.getElementById(`hash-${id}`);
+      if (isBrokenCascade) {
+        csb.className = 'chain-status-bar invalid';
+        csbDot.innerHTML = '⚠️'; csbDot.className = ''; csbDot.style.background='transparent';
+        csbTitle.style.color = 'var(--arb-red)'; csbTitle.innerHTML = '✗ Chain Integrity Violated';
+        csbDesc.innerHTML = 'Block data was modified. Re-mine to restore the chain.';
+        csbBtn.style.display = 'block';
+      } else {
+        csb.className = 'chain-status-bar valid';
+        csbDot.innerHTML = ''; csbDot.className = 'pulse-dot-live';
+        csbTitle.style.color = 'var(--arb-green)'; csbTitle.innerHTML = '✓ Blockchain Integrity: VALID';
+        csbDesc.innerHTML = 'All 3 blocks are properly linked and hashed';
+        csbBtn.style.display = 'none';
+      }
+    };
 
-      // Setup UI loading state
-      btnMine.disabled = true;
-      btnMine.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Mining...';
-      cardUI.classList.add('block-mining');
+    window.mineBlock = async (id) => {
+      const b = chain[id-1];
+      const btn = document.getElementById(`btn-${id}`);
+      const card = document.getElementById(`card-${id}`);
+      const nonceI = document.getElementById(`nonce-${id}`);
+      const hashD = document.getElementById(`hash-${id}`);
+      const pWrap = document.getElementById(`progwrap-${id}`);
+      const pFill = document.getElementById(`progfill-${id}`);
+      const minestat = document.getElementById(`minestat-${id}`);
+
+      btn.className = 'mine-btn mining';
+      card.classList.add('mining');
+      btn.disabled = true;
+      pWrap.classList.add('active');
+      minestat.style.opacity = '0';
       
-      let nonce = 0;
-      let hashStr = "";
+      let n = 0;
+      let h = '';
+      const startT = performance.now();
+      
+      // Est max nonces roughly
+      let maxN = 16;
+      if(difficultyPrefix.length===2) maxN=256;
+      if(difficultyPrefix.length===3) maxN=4096;
+      if(difficultyPrefix.length===4) maxN=65536;
 
-      // Loop iteratively pushing updates to DOM fast but safely without blocking main thread fully
-      const BATCH_SIZE = 500; 
-
-      while (true) {
-        // Fast calculate batch of hashes
-        for (let i=0; i<BATCH_SIZE; i++) {
-          hashStr = await calculateHash(id, nonce, targetBlock.data, targetBlock.prevHash);
-          if (hashStr.startsWith('00')) break;
-          nonce++;
+      while(true) {
+        for(let i=0; i<300; i++) {
+          n++;
+          h = await sha256(`${b.id}${n}${b.data}${b.computedPrevHash}`);
+          if(h.startsWith(difficultyPrefix)) break;
         }
         
-        // Show live tick progress to user
-        nonceUI.value = nonce;
-        hashUI.value = hashStr;
-
-        if (hashStr.startsWith('00')) break; // End if golden nonce found
+        nonceI.value = n;
+        // String scramble
+        let scram = ''; const chars='0123456789abcdef';
+        for(let j=0; j<64; j++) scram+=chars[Math.floor(Math.random()*16)];
+        hashD.innerHTML = scram;
+        hashD.style.color = 'var(--arb-cyan)';
         
-        // Frame yield to allow DOM paint
-        await delay(10); 
+        let pct = (n / maxN)*100;
+        if(pct > 95) pct = 95;
+        pFill.style.width = pct + '%';
+        
+        if(h.startsWith(difficultyPrefix)) break;
+        await new Promise(r => setTimeout(r, 0));
       }
 
-      // Sync and teardown UI lock
-      targetBlock.nonce = nonce;
-      targetBlock.hash = hashStr;
+      const endT = performance.now();
+      b.nonce = n;
+      b.hash = h;
       
-      cardUI.classList.remove('block-mining');
-      btnMine.disabled = false;
-      btnMine.innerHTML = '<i class="fa-solid fa-hammer"></i> Mine Block';
+      const tSec = ((endT-startT)/1000).toFixed(2);
+      const rate = Math.floor(n / ((endT-startT)/1000));
+      minestat.innerHTML = `⏱ Time: ${tSec}s | 🔢 Nonces: ${n.toLocaleString()} | ⚡ Rate: ${rate.toLocaleString()}/s`;
 
-      // Propagate the new valid hash cleanly down chain
-      recalculateChain();
-    }
+      totalNonces += n;
+      totalMined++;
+      nonceRecords.push(n);
+      document.getElementById('glb-nonces').innerText = totalNonces.toLocaleString();
+      document.getElementById('glb-blocks').innerText = totalMined.toLocaleString();
+      document.getElementById('last-mine-sec').innerText = `${tSec}s`;
+      document.getElementById('avg-nonces').innerText = Math.floor(totalNonces/totalMined).toLocaleString();
 
-    // Boot Up Sequence
-    async function launchSimulator() {
-      // Intially compute valid static state so everything is green on load
+      btn.className = 'mine-btn success';
+      btn.innerHTML = '✅ Block Mined!';
+      pWrap.classList.remove('active');
+      minestat.style.opacity = '1';
+      
+      // Confetti logic
+      for(let i=0;i<16;i++){
+        let c = document.createElement('div');
+        c.className='confetti';
+        c.style.width='6px';c.style.height='6px';
+        const cols=['#28A0F0','#00D4FF','#7B2FBE','#00ff94'];
+        c.style.background = cols[Math.floor(Math.random()*cols.length)];
+        c.style.left = (btn.getBoundingClientRect().left + btn.offsetWidth/2) + 'px';
+        c.style.top = btn.getBoundingClientRect().top + 'px';
+        document.body.appendChild(c);
+        
+        const tx = (Math.random()-0.5)*240; const ty = -20 - Math.random()*130;
+        c.animate([
+          {transform:'translate(0,0) scale(0)', opacity:1},
+          {transform:`translate(${tx}px, ${ty}px) scale(1)`, opacity:1, offset:0.7},
+          {transform:`translate(${tx}px, ${ty}px) scale(1)`, opacity:0}
+        ], {duration:800, easing:'ease-out'});
+        setTimeout(()=>c.remove(), 800);
+      }
+
+      await updateNetwork();
+
+      setTimeout(()=>{
+        btn.disabled = false;
+        btn.className = 'mine-btn default';
+        btn.innerHTML = `⛏ Mine Block #${b.id}`;
+        card.classList.remove('mining');
+      }, 2000);
+    };
+
+    document.querySelectorAll('.diff-pill').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.diff-pill').forEach(p => { p.className = 'diff-pill ' + p.classList[2]; });
+        e.target.classList.add('active');
+        difficultyPrefix = e.target.dataset.prefix;
+        document.getElementById('diff-target-txt').innerHTML = `Target: Hash must start with → '${difficultyPrefix}'`;
+        updateNetwork();
+      });
+    });
+
+    document.getElementById('mine-all-btn').addEventListener('click', async (e) => {
+      const btn = e.target;
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Mining All...';
+      btn.disabled = true;
+      for(let i=1;i<=3;i++) {
+        await mineBlock(i);
+        // Wait till mine success unblocks visually slightly
+        await new Promise(r=>setTimeout(r, 600)); 
+      }
+      btn.innerHTML = '⛏ Mine All Blocks';
+      btn.disabled = false;
+    });
+
+    document.getElementById('reset-chain-btn').addEventListener('click', async () => {
+      chain = JSON.parse(JSON.stringify(INITIAL_CHAIN));
+      document.querySelectorAll('.diff-pill')[0].click(); // reset to easy
+      await forceValid();
+      buildDOM();
+      updateNetwork();
+    });
+
+    async function forceValid() {
       for (let i = 0; i < chain.length; i++) {
-        if (i > 0) chain[i].prevHash = chain[i-1].hash;
-        chain[i].hash = await calculateHash(chain[i].id, chain[i].nonce, chain[i].data, chain[i].prevHash);
+        if (i > 0) chain[i].computedPrevHash = chain[i-1].hash;
+        chain[i].hash = await sha256(`${chain[i].id}${chain[i].nonce}${chain[i].data}${chain[i].computedPrevHash}`);
         
-        // If loaded data isn't valid, mine it instantly in background so load state is fully perfect
-        if (!chain[i].hash.startsWith('00')) {
+        if (!chain[i].hash.startsWith(difficultyPrefix)) {
           let nonce = 0;
           while(true){
-             const h = await calculateHash(chain[i].id, nonce, chain[i].data, chain[i].prevHash);
-             if (h.startsWith('00')){
+             const h = await sha256(`${chain[i].id}${nonce}${chain[i].data}${chain[i].computedPrevHash}`);
+             if (h.startsWith(difficultyPrefix)){
                chain[i].nonce = nonce;
                chain[i].hash = h;
                break;
@@ -267,11 +416,14 @@
           }
         }
       }
-      initializeDOM();
-      recalculateChain(); 
     }
 
-    launchSimulator();
+    const init = async () => {
+      await forceValid();
+      buildDOM();
+      await updateNetwork();
+    };
+    init();
 
   </script>
   <script src="cursor.js"></script>

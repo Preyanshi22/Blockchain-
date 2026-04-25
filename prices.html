@@ -3,200 +3,398 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ArbiLearn | Live Crypto Prices</title>
-  
+  <title>ArbiLearn | Live Crypto Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="page-transition">
   
-  <div class="ambient-glow glow-1"></div>
-  <div class="ambient-glow glow-2"></div>
-
-  <main class="container animate-fade-in" style="padding: 4rem 20px;">
-    
-    <div style="text-align: center; margin-bottom: 3rem;">
-      <h1 class="hero-title" style="font-size: 3rem;">Live Crypto Dashboard <span class="live-indicator" style="vertical-align: middle;"></span></h1>
-      <p class="hero-subtitle">Real-time prices powered by CoinGecko API</p>
-    </div>
-
-    <div class="controls-bar glass-panel" style="padding: 1.5rem;">
-      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-        <button id="refresh-btn" class="btn btn-primary">
-          <i class="fa-solid fa-rotate-right" id="refresh-icon"></i> Refresh Prices
-        </button>
-        <span style="font-size: 0.85rem; color: rgba(232, 244, 253, 0.6);" id="last-updated">Last updated: --</span>
-        <span style="font-size: 0.85rem; color: var(--electric-cyan);" id="auto-refresh-timer">Auto-refresh in: 60s</span>
-      </div>
-      
+  <div class="hero-layered">
+    <div class="hero-scanline"></div>
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap: 2rem; position:relative; z-index:2;">
       <div>
-        <input type="text" id="search-input" class="search-bar" placeholder="Search coins (e.g. BTC, Arbitrum)...">
+        <div style="background: rgba(40,160,240,0.12); border: 1px solid rgba(40,160,240,0.3); padding: 6px 16px; border-radius: 50px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; display: inline-flex; align-items: center; color: var(--text-primary); margin-bottom: 12px;">
+          <span class="pulse-dot-live"></span> LIVE
+        </div>
+        <h1 style="font-family: 'Space Grotesk'; font-weight: 700; font-size: clamp(2rem, 4vw, 3rem); background: linear-gradient(135deg, #F0F8FF 0%, #28A0F0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Crypto Market Dashboard</h1>
+        <p style="font-family: 'Inter'; font-size: 0.95rem; color: var(--text-muted); margin-top: 10px;">Real-time prices powered by CoinGecko API — No API key required</p>
+      </div>
+      <div class="glass-card" style="display:inline-flex; gap:32px; padding: 1.5rem 2rem;">
+        <div style="display:flex; flex-direction:column;">
+          <span style="color:var(--text-muted); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Coins Tracked</span>
+          <span style="font-family:'Space Grotesk'; font-weight:600; font-size:1.1rem; color:var(--arb-cyan);">5</span>
+        </div>
+        <div style="width:1px; background:rgba(255,255,255,0.08);"></div>
+        <div style="display:flex; flex-direction:column;">
+          <span style="color:var(--text-muted); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Data Source</span>
+          <span style="font-family:'Space Grotesk'; font-weight:600; font-size:1.1rem; color:var(--arb-cyan);">CoinGecko</span>
+        </div>
+        <div style="width:1px; background:rgba(255,255,255,0.08);"></div>
+        <div style="display:flex; flex-direction:column;">
+          <span style="color:var(--text-muted); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Refresh</span>
+          <span style="font-family:'Space Grotesk'; font-weight:600; font-size:1.1rem; color:var(--arb-cyan);">60s</span>
+        </div>
       </div>
     </div>
+  </div>
 
-    <!-- Error State -->
-    <div id="error-card" class="warning-banner" style="display: none; padding: 2rem; margin-bottom: 2rem;">
-      <h3><i class="fa-solid fa-triangle-exclamation"></i> Unable to fetch prices. Check connection.</h3>
-      <p style="margin-top: 0.5rem; color: #ffb3b3;">Please try refreshing manually or checking if you are rate-limited by CoinGecko.</p>
+  <div class="market-summary-bar" id="summary-bar">
+    <div class="marquee-track" id="marquee-track">
+      <!-- Injected via JS -->
+    </div>
+  </div>
+
+  <div class="controls-row">
+    <div class="search-input-wrap">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="search-input" class="search-input" placeholder="Search coin...">
+    </div>
+    
+    <div style="display:flex; gap:10px;" id="sort-controls">
+      <button class="pill-toggle active" data-sort="mcap">Market Cap</button>
+      <button class="pill-toggle" data-sort="price">Price</button>
+      <button class="pill-toggle" data-sort="change">24h Change</button>
     </div>
 
-    <!-- Grid Container -->
-    <div class="grid-3" id="prices-grid">
-      <!-- Cards will be dynamically injected here via JS -->
+    <div style="display:flex; gap:16px; align-items:center;">
+      <div class="refresh-ring-wrap">
+        <svg class="refresh-ring-svg" viewBox="0 0 40 40">
+          <circle cx="20" cy="20" r="18" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3"></circle>
+          <circle id="timer-circle" cx="20" cy="20" r="18" fill="none" stroke="var(--arb-cyan)" stroke-width="3" stroke-dasharray="113" stroke-dashoffset="0" style="transition: stroke-dashoffset 1s linear;"></circle>
+        </svg>
+        <span id="timer-text">60</span>
+      </div>
+      <button id="refresh-btn" style="background:linear-gradient(135deg, var(--arb-blue), var(--arb-cyan)); border:none; border-radius:10px; padding:10px 20px; font-family:'Space Grotesk'; font-weight:600; font-size:0.85rem; cursor:pointer; color:#000; box-shadow:var(--glow-blue); transition:var(--transition); display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-rotate-right" id="refresh-icon"></i> <span id="refresh-text">Refresh</span>
+      </button>
     </div>
+  </div>
 
-  </main>
+  <div id="error-card" style="display:none; max-width:480px; margin:0 auto 3rem; text-align:center;" class="glass-card">
+    <i class="fa-solid fa-triangle-exclamation" style="font-size:2.5rem; color:var(--arb-red); margin-bottom:1rem;"></i>
+    <h3 style="font-family:'Space Grotesk'; font-weight:600; font-size:1.4rem; margin-bottom:0.5rem;">Connection Failed</h3>
+    <p style="font-family:'Inter'; font-size:0.9rem; color:var(--text-muted); margin-bottom:1.5rem;">CoinGecko API is currently unreachable. Showing last cached data.</p>
+    <div style="display:flex; justify-content:center; gap:1rem;">
+      <button id="retry-btn" class="btn btn-primary" style="padding:10px 20px;"><i class="fa-solid fa-rotate-right"></i> Retry Now</button>
+      <button class="btn btn-secondary" style="padding:10px 20px;" onclick="document.getElementById('error-card').style.display='none'"><i class="fa-solid fa-clipboard-list"></i> View Cached</button>
+    </div>
+    <p id="retry-text" style="font-size:0.8rem; color:var(--text-muted); margin-top:1rem; display:none;">Retrying in 4s...</p>
+  </div>
+
+  <div class="price-grid" id="prices-grid" style="margin-bottom:6rem;"></div>
+
+  <div class="portfolio-bar" id="portfolio-bar">
+    <div style="font-family:'Space Grotesk'; font-weight:500; font-size:0.9rem; color:var(--text-muted);">💼 Portfolio Value</div>
+    <div id="portfolio-total" style="font-family:'Space Grotesk'; font-weight:700; font-size:clamp(1.4rem, 2.5vw, 2rem); background:linear-gradient(90deg, var(--arb-cyan), var(--arb-blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">$0.00</div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-secondary" style="padding:8px 16px; font-size:0.8rem;" onclick="savePortfolio()">💾 Save</button>
+      <button class="btn btn-danger" style="padding:8px 16px; font-size:0.8rem;" onclick="clearPortfolio()">🗑 Clear</button>
+    </div>
+  </div>
 
   <script src="navbar.js"></script>
   <script>
     loadLayout('prices');
 
-    const API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,matic-network,arbitrum&vs_currencies=usd&include_24hr_change=true';
+    const API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,matic-network,arbitrum&vs_currencies=usd&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true&include_7d_sparkline=true';
     
-    // Hardcoded static metadata for visual display mapping
     const COIN_METADATA = {
-      'bitcoin': { name: 'Bitcoin', ticker: 'BTC', img: 'https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg', color: '#f7931a' },
-      'ethereum': { name: 'Ethereum', ticker: 'ETH', img: 'https://upload.wikimedia.org/wikipedia/commons/0/05/Ethereum_logo_2014.svg', color: '#627eea' },
-      'solana': { name: 'Solana', ticker: 'SOL', img: 'https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png', color: '#14F195' },
-      'matic-network': { name: 'Polygon', ticker: 'MATIC', img: 'https://cryptologos.cc/logos/polygon-matic-logo.svg?v=024', color: '#8247E5' },
-      'arbitrum': { name: 'Arbitrum', ticker: 'ARB', img: 'https://cryptologos.cc/logos/arbitrum-arb-logo.svg?v=024', color: '#28A0F0' }
+      'bitcoin': { name: 'Bitcoin', ticker: 'BTC', img: 'https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg', color: 'linear-gradient(90deg, #F7931A, #FFB347)' },
+      'ethereum': { name: 'Ethereum', ticker: 'ETH', img: 'https://upload.wikimedia.org/wikipedia/commons/0/05/Ethereum_logo_2014.svg', color: 'linear-gradient(90deg, #627EEA, #A78BFA)' },
+      'solana': { name: 'Solana', ticker: 'SOL', img: 'https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png', color: 'linear-gradient(90deg, #9945FF, #14F195)' },
+      'matic-network': { name: 'Polygon', ticker: 'MATIC', img: 'https://cryptologos.cc/logos/polygon-matic-logo.svg?v=024', color: 'linear-gradient(90deg, #8247E5, #A78BFA)' },
+      'arbitrum': { name: 'Arbitrum', ticker: 'ARB', img: 'https://cryptologos.cc/logos/arbitrum-arb-logo.svg?v=024', color: 'linear-gradient(90deg, #28A0F0, #00D4FF)' }
     };
 
     const pricesGrid = document.getElementById('prices-grid');
-    const errorCard = document.getElementById('error-card');
+    const timerCircle = document.getElementById('timer-circle');
+    const timerText = document.getElementById('timer-text');
     const refreshBtn = document.getElementById('refresh-btn');
     const refreshIcon = document.getElementById('refresh-icon');
-    const lastUpdatedLabel = document.getElementById('last-updated');
-    const autoRefreshTimer = document.getElementById('auto-refresh-timer');
-    const searchInput = document.getElementById('search-input');
-
-    let refreshInterval;
-    let countdownInterval;
+    const refreshBtnTxt = document.getElementById('refresh-text');
+    const errorCard = document.getElementById('error-card');
+    let currentData = null;
     let timerSeconds = 60;
-    let currentData = null; // Store data to support searching
+    let countdownInterval;
+    let currentSort = 'mcap';
+    let filterText = '';
+    let retryTimeout = 2; // backoff
 
-    // Format currency
-    const formatPrice = (price) => {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
+    // Portfolio
+    const holdings = JSON.parse(localStorage.getItem('arbi_holdings') || '{}');
+
+    function drawSparkline(canvasId, dataPoints, isPositive) {
+      setTimeout(() => {
+        const canvas = document.getElementById(canvasId);
+        if(!canvas || !dataPoints || dataPoints.length === 0) return;
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width = canvas.offsetWidth;
+        const h = canvas.height = 60;
+        
+        const min = Math.min(...dataPoints);
+        const max = Math.max(...dataPoints);
+        const range = max - min || 1;
+        
+        ctx.clearRect(0,0,w,h);
+        ctx.beginPath();
+        
+        const step = w / (dataPoints.length - 1);
+        const points = dataPoints.map((p, i) => ({ x: i * step, y: h - ((p - min)/range)*h }));
+        
+        ctx.moveTo(points[0].x, points[0].y);
+        for(let i=1; i<points.length-1; i++) {
+          const xc = (points[i].x + points[i+1].x)/2;
+          const yc = (points[i].y + points[i+1].y)/2;
+          ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+        }
+        ctx.lineTo(points[points.length-1].x, points[points.length-1].y);
+        
+        ctx.strokeStyle = isPositive ? '#00ff94' : '#ff4560';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        ctx.lineTo(w, h);
+        ctx.lineTo(0, h);
+        ctx.closePath();
+        
+        const grad = ctx.createLinearGradient(0,0,0,h);
+        grad.addColorStop(0, isPositive ? 'rgba(0,255,148,0.08)' : 'rgba(255,69,96,0.08)');
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }, 50);
+    }
+
+    const formatNum = (num, isCurrency=true, compact=false) => {
+      const opts = { style: isCurrency ? 'currency' : 'decimal', currency: 'USD' };
+      if(compact) opts.notation = "compact";
+      return new Intl.NumberFormat('en-US', opts).format(num);
     };
 
     const renderSkeletons = () => {
       pricesGrid.innerHTML = '';
       for (let i = 0; i < 5; i++) {
         pricesGrid.innerHTML += `
-          <div class="glass-panel price-card skeleton-load" style="min-height: 200px; border-bottom-color: transparent;"></div>
+          <div class="card-skeleton">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="skeleton-shimmer" style="width:40px; height:40px; border-radius:50%;"></div>
+              <div class="skeleton-shimmer" style="width:40px; height:20px; border-radius:6px;"></div>
+            </div>
+            <div class="skeleton-shimmer" style="width:60%; height:12px; border-radius:6px; margin-top:20px;"></div>
+            <div class="skeleton-shimmer" style="width:40%; height:20px; border-radius:6px; margin-top:10px;"></div>
+            <div class="skeleton-shimmer" style="width:100%; height:40px; border-radius:6px; margin-top:20px;"></div>
+            <div class="skeleton-shimmer" style="width:80%; height:8px; border-radius:4px; margin-top:16px;"></div>
+          </div>
         `;
       }
     };
 
-    const fetchPrices = async () => {
-      // Show loading state
-      refreshIcon.classList.add('fa-spin');
-      if (!currentData) renderSkeletons();
-      errorCard.style.display = 'none';
-
-      try {
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error('API Request Failed');
-        
-        const data = await response.json();
-        currentData = data;
-        renderCards(data);
-
-        // Update timestamps
-        const now = new Date();
-        lastUpdatedLabel.textContent = `Last updated: ${now.toLocaleTimeString()}`;
-        
-        // Reset Timer
-        resetTimer();
-
-      } catch (err) {
-        console.error(err);
-        if (!currentData) {
-          pricesGrid.innerHTML = '';
-          errorCard.style.display = 'block';
-        }
-      } finally {
-        setTimeout(() => refreshIcon.classList.remove('fa-spin'), 500);
+    const buildMarquee = (data) => {
+      const msb = document.getElementById('marquee-track');
+      let st = '';
+      for(const [id, info] of Object.entries(data)){
+        const meta = COIN_METADATA[id];
+        if(!meta) continue;
+        const color = info.usd_24h_change >= 0 ? '#00ff94' : '#ff4560';
+        const ic = info.usd_24h_change >= 0 ? '▲' : '▼';
+        st += `<span style="margin:0 2rem;">⚡ ${meta.ticker}: $${info.usd} <span style="color:${color}; ml-2">${ic} ${Math.abs(info.usd_24h_change).toFixed(2)}%</span></span>`;
       }
+      msb.innerHTML = st + st;
     };
 
-    const renderCards = (data, filterText = '') => {
-      if (!data) return;
+    const renderCards = () => {
+      if (!currentData) return;
       pricesGrid.innerHTML = '';
 
-      // Determine the trending coin (highest positive 24h change)
-      let highestGain = -Infinity;
-      let trendingCoinId = null;
-      for (const [id, info] of Object.entries(data)) {
-        if (info.usd_24h_change > highestGain) {
-          highestGain = info.usd_24h_change;
-          trendingCoinId = id;
-        }
-      }
+      let arr = Object.entries(currentData).map(([id, info]) => ({ id, ...info, meta: COIN_METADATA[id] })).filter(c=>c.meta);
+      
+      // Sort
+      arr.sort((a,b) => {
+        if(currentSort === 'mcap') return b.usd_market_cap - a.usd_market_cap;
+        if(currentSort === 'price') return b.usd - a.usd;
+        return b.usd_24h_change - a.usd_24h_change;
+      });
 
-      for (const [id, info] of Object.entries(data)) {
-        const meta = COIN_METADATA[id];
-        if (!meta) continue;
+      let rank = 1;
+      let highestGain = Math.max(...arr.map(c=>c.usd_24h_change));
 
-        // Apply Search Filter
-        const searchTarget = `${meta.name.toLowerCase()} ${meta.ticker.toLowerCase()}`;
-        if (filterText && !searchTarget.includes(filterText.toLowerCase())) {
-          continue; // Skip card if it doesn't match
-        }
+      arr.forEach((coin) => {
+        // Filter
+        const sn = `${coin.meta.name.toLowerCase()} ${coin.meta.ticker.toLowerCase()}`;
+        const isHidden = filterText && !sn.includes(filterText.toLowerCase());
 
-        const price = formatPrice(info.usd);
-        const change = info.usd_24h_change;
-        const isUp = change >= 0;
-        const changeClass = isUp ? 'text-green' : 'text-red';
-        const changeIcon = isUp ? '▲' : '▼';
-        const borderColor = isUp ? '#50ff78' : '#ff5050';
-        const isTrending = id === trendingCoinId && change > 0;
-
+        const isTrending = coin.usd_24h_change === highestGain && highestGain > 0;
+        const isPos = coin.usd_24h_change >= 0;
+        
         const cardHTML = `
-          <div class="glass-panel price-card" style="border-bottom-color: ${borderColor}; --glow-blue: 0 0 20px ${borderColor}80;">
-            ${isTrending ? '<div class="trending-badge">🔥 Trending</div>' : ''}
-            <img src="${meta.img}" alt="${meta.name}" class="coin-logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/3/36/Unknown_logo.svg'">
-            <h3 style="margin-bottom: 0;">${meta.name} — ${meta.ticker}</h3>
-            <div class="coin-price">${price}</div>
-            <div class="coin-change ${changeClass}">
-              ${changeIcon} ${Math.abs(change).toFixed(2)}%
+          <div class="price-card ${isHidden ? 'filtered-out' : ''}" style="--glow-blue: 0 0 20px ${isPos?'#00ff9420':'#ff456020'}; order: ${rank};">
+            <div class="top-accent-bar" style="background: ${coin.meta.color}"></div>
+            ${isTrending ? '<div class="trending-badge">🔥 HOT</div>' : ''}
+            
+            <div class="card-inner">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center;">
+                  <img src="${coin.meta.img}" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/3/36/Unknown_logo.svg'" style="width:44px; height:44px; border-radius:50%; border:2px solid rgba(255,255,255,0.1);">
+                  <div style="margin-left:12px;">
+                    <div style="font-family:'Space Grotesk'; font-weight:600; font-size:1rem; color:white;">${coin.meta.name}</div>
+                  </div>
+                  <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:2px 8px; font-family:'JetBrains Mono'; font-size:0.7rem; color:var(--text-muted); margin-left:8px;">${coin.meta.ticker}</span>
+                </div>
+                <div style="background:rgba(40,160,240,0.1); border:1px solid rgba(40,160,240,0.2); border-radius:6px; padding:3px 10px; font-family:'JetBrains Mono'; font-size:0.7rem; color:var(--arb-blue);">#${rank}</div>
+              </div>
+              
+              <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:flex-end;">
+                <div style="font-family:'JetBrains Mono'; font-weight:700; font-size:clamp(1.5rem, 2.5vw, 2rem); color:white; letter-spacing:-0.02em;">${formatNum(coin.usd)}</div>
+                <div style="background:${isPos?'rgba(0,255,148,0.1)':'rgba(255,69,96,0.1)'}; border:1px solid ${isPos?'rgba(0,255,148,0.25)':'rgba(255,69,96,0.25)'}; color:${isPos?'var(--arb-green)':'var(--arb-red)'}; font-family:'JetBrains Mono'; font-weight:600; font-size:0.85rem; padding:4px 12px; border-radius:8px;">
+                  ${isPos?'▲ +':'▼ '}${coin.usd_24h_change.toFixed(2)}%
+                </div>
+              </div>
+
+              <div style="margin-top:16px;">
+                <canvas id="spark-${coin.id}" style="width:100%; height:60px;"></canvas>
+              </div>
+
+              <div style="margin-top:16px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+                <div style="display:flex; flex-direction:column; border-right:1px solid rgba(255,255,255,0.06);">
+                  <span style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted);">Mkt Cap</span>
+                  <span style="font-size:0.85rem; font-family:'Space Grotesk'; font-weight:600; color:white;">${formatNum(coin.usd_market_cap, true, true)}</span>
+                </div>
+                <div style="display:flex; flex-direction:column; border-right:1px solid rgba(255,255,255,0.06); padding-left:10px;">
+                  <span style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted);">24h Vol</span>
+                  <span style="font-size:0.85rem; font-family:'Space Grotesk'; font-weight:600; color:white;">${formatNum(coin.usd_24h_vol, true, true)}</span>
+                </div>
+                <div style="display:flex; flex-direction:column; padding-left:10px;">
+                  <span style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted);">Rank</span>
+                  <span style="font-size:0.85rem; font-family:'Space Grotesk'; font-weight:600; color:white;">#${rank}</span>
+                </div>
+              </div>
+
+              <div style="margin-top:16px; border-top:1px solid rgba(255,255,255,0.05); padding-top:16px;">
+                <label style="font-size:0.7rem; color:var(--text-muted); display:block;">My Holdings</label>
+                <input type="number" class="portfolio-input" data-id="${coin.id}" value="${holdings[coin.id]||''}" placeholder="0.00" oninput="updatePortfolio()">
+                <div id="port-val-${coin.id}" style="font-family:'JetBrains Mono'; font-size:0.8rem; color:var(--arb-cyan); margin-top:6px;">≈ $0.00</div>
+              </div>
             </div>
           </div>
         `;
         pricesGrid.insertAdjacentHTML('beforeend', cardHTML);
-      }
+        if(coin.sparkline_in_7d && coin.sparkline_in_7d.price) {
+          drawSparkline(`spark-${coin.id}`, coin.sparkline_in_7d.price, isPos);
+        }
+        rank++;
+      });
+      updatePortfolio();
+    };
 
-      if (pricesGrid.children.length === 0) {
-        pricesGrid.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: rgba(232, 244, 253, 0.6);">No coins match your search.</p>`;
-      }
+    const updatePortfolio = () => {
+      let tot = 0;
+      let active = false;
+      document.querySelectorAll('.portfolio-input').forEach(inp => {
+        const id = inp.dataset.id;
+        const amt = parseFloat(inp.value) || 0;
+        if(inp.value !== '') active = true;
+        holdings[id] = amt;
+        const val = amt * (currentData[id]?.usd || 0);
+        document.getElementById(`port-val-${id}`).innerText = `≈ ${formatNum(val,true)}`;
+        tot += val;
+      });
+      document.getElementById('portfolio-total').innerText = formatNum(tot, true);
+      if(active) document.getElementById('portfolio-bar').classList.add('active');
+      else document.getElementById('portfolio-bar').classList.remove('active');
+    };
+
+    window.savePortfolio = () => {
+      localStorage.setItem('arbi_holdings', JSON.stringify(holdings));
+      const btn = document.querySelector('.portfolio-bar .btn-secondary');
+      btn.innerText = "✓ Saved"; setTimeout(()=>btn.innerText="💾 Save", 1500);
+    };
+
+    window.clearPortfolio = () => {
+      localStorage.removeItem('arbi_holdings');
+      document.querySelectorAll('.portfolio-input').forEach(inp => {inp.value=''; holdings[inp.dataset.id]=0; });
+      updatePortfolio();
+    };
+
+    const fetchPrices = async () => {
+      refreshBtn.disabled = true;
+      refreshBtn.style.opacity = '0.7';
+      refreshBtn.style.cursor = 'not-allowed';
+      refreshIcon.classList.add('fa-spin');
+      refreshBtnTxt.innerText = 'Fetching...';
       
-      // Re-bind cursor listeners dynamically generated after API responses mapping interactives
-      if (window.requeryCursor) window.requeryCursor();
+      if (!currentData) renderSkeletons();
+      
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('API Request Failed');
+        const data = await response.json();
+        currentData = data;
+        errorCard.style.display = 'none';
+        retryTimeout = 2;
+        
+        buildMarquee(data);
+        renderCards();
+        resetTimer();
+        
+        refreshBtnTxt.innerText = '✓ Updated';
+      } catch (err) {
+        console.error(err);
+        if(!currentData) {
+          pricesGrid.innerHTML = '';
+          errorCard.style.display = 'block';
+          const rxt = document.getElementById('retry-text');
+          rxt.style.display = 'block';
+          rxt.innerText = `Retrying in ${retryTimeout}s...`;
+          setTimeout(fetchPrices, retryTimeout * 1000);
+          retryTimeout *= 2;
+        }
+      } finally {
+        setTimeout(() => {
+          refreshBtn.disabled = false;
+          refreshBtn.style.opacity = '1';
+          refreshBtn.style.cursor = 'pointer';
+          refreshIcon.classList.remove('fa-spin');
+          refreshBtnTxt.innerText = 'Refresh';
+        }, 1500);
+      }
     };
 
     const resetTimer = () => {
       timerSeconds = 60;
-      autoRefreshTimer.textContent = `Auto-refresh in: ${timerSeconds}s`;
+      timerText.innerText = '60';
+      timerCircle.style.strokeDashoffset = '0';
       clearInterval(countdownInterval);
+      
       countdownInterval = setInterval(() => {
         timerSeconds--;
         if (timerSeconds <= 0) {
           fetchPrices();
         } else {
-          autoRefreshTimer.textContent = `Auto-refresh in: ${timerSeconds}s`;
+          timerText.innerText = timerSeconds;
+          const targetOffset = 113 * (1 - (timerSeconds/60));
+          timerCircle.style.strokeDashoffset = targetOffset;
         }
       }, 1000);
     };
 
-    // Event Listeners
+    // Events
     refreshBtn.addEventListener('click', fetchPrices);
+    document.getElementById('retry-btn').addEventListener('click', fetchPrices);
     
-    searchInput.addEventListener('input', (e) => {
-      renderCards(currentData, e.target.value);
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      filterText = e.target.value;
+      renderCards();
     });
 
-    // Initial Load
+    document.querySelectorAll('.pill-toggle').forEach(pill => {
+      pill.addEventListener('click', (e) => {
+        document.querySelectorAll('.pill-toggle').forEach(p=>p.classList.remove('active'));
+        e.target.classList.add('active');
+        currentSort = e.target.dataset.sort;
+        renderCards();
+      });
+    });
+
     fetchPrices();
 
   </script>
