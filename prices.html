@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArbiLearn | Live Crypto Prices</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <main class="container animate-fade-in" style="padding: 4rem 20px;">
+    
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <h1 class="hero-title" style="font-size: 3rem;">Live Crypto Dashboard <span class="live-indicator" style="vertical-align: middle;"></span></h1>
+      <p class="hero-subtitle">Real-time prices powered by CoinGecko API</p>
+    </div>
+
+    <div class="controls-bar glass-panel" style="padding: 1.5rem;">
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <button id="refresh-btn" class="btn btn-primary">
+          <i class="fa-solid fa-rotate-right" id="refresh-icon"></i> Refresh Prices
+        </button>
+        <span style="font-size: 0.85rem; color: rgba(232, 244, 253, 0.6);" id="last-updated">Last updated: --</span>
+        <span style="font-size: 0.85rem; color: var(--electric-cyan);" id="auto-refresh-timer">Auto-refresh in: 60s</span>
+      </div>
+      
+      <div>
+        <input type="text" id="search-input" class="search-bar" placeholder="Search coins (e.g. BTC, Arbitrum)...">
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-card" class="warning-banner" style="display: none; padding: 2rem; margin-bottom: 2rem;">
+      <h3><i class="fa-solid fa-triangle-exclamation"></i> Unable to fetch prices. Check connection.</h3>
+      <p style="margin-top: 0.5rem; color: #ffb3b3;">Please try refreshing manually or checking if you are rate-limited by CoinGecko.</p>
+    </div>
+
+    <!-- Grid Container -->
+    <div class="grid-3" id="prices-grid">
+      <!-- Cards will be dynamically injected here via JS -->
+    </div>
+
+  </main>
+
+  <script src="navbar.js"></script>
+  <script>
+    loadLayout('prices');
+
+    const API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,matic-network,arbitrum&vs_currencies=usd&include_24hr_change=true';
+    
+    // Hardcoded static metadata for visual display mapping
+    const COIN_METADATA = {
+      'bitcoin': { name: 'Bitcoin', ticker: 'BTC', img: 'https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg', color: '#f7931a' },
+      'ethereum': { name: 'Ethereum', ticker: 'ETH', img: 'https://upload.wikimedia.org/wikipedia/commons/0/05/Ethereum_logo_2014.svg', color: '#627eea' },
+      'solana': { name: 'Solana', ticker: 'SOL', img: 'https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png', color: '#14F195' },
+      'matic-network': { name: 'Polygon', ticker: 'MATIC', img: 'https://cryptologos.cc/logos/polygon-matic-logo.svg?v=024', color: '#8247E5' },
+      'arbitrum': { name: 'Arbitrum', ticker: 'ARB', img: 'https://cryptologos.cc/logos/arbitrum-arb-logo.svg?v=024', color: '#28A0F0' }
+    };
+
+    const pricesGrid = document.getElementById('prices-grid');
+    const errorCard = document.getElementById('error-card');
+    const refreshBtn = document.getElementById('refresh-btn');
+    const refreshIcon = document.getElementById('refresh-icon');
+    const lastUpdatedLabel = document.getElementById('last-updated');
+    const autoRefreshTimer = document.getElementById('auto-refresh-timer');
+    const searchInput = document.getElementById('search-input');
+
+    let refreshInterval;
+    let countdownInterval;
+    let timerSeconds = 60;
+    let currentData = null; // Store data to support searching
+
+    // Format currency
+    const formatPrice = (price) => {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
+    };
+
+    const renderSkeletons = () => {
+      pricesGrid.innerHTML = '';
+      for (let i = 0; i < 5; i++) {
+        pricesGrid.innerHTML += `
+          <div class="glass-panel price-card skeleton-load" style="min-height: 200px; border-bottom-color: transparent;"></div>
+        `;
+      }
+    };
+
+    const fetchPrices = async () => {
+      // Show loading state
+      refreshIcon.classList.add('fa-spin');
+      if (!currentData) renderSkeletons();
+      errorCard.style.display = 'none';
+
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('API Request Failed');
+        
+        const data = await response.json();
+        currentData = data;
+        renderCards(data);
+
+        // Update timestamps
+        const now = new Date();
+        lastUpdatedLabel.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+        
+        // Reset Timer
+        resetTimer();
+
+      } catch (err) {
+        console.error(err);
+        if (!currentData) {
+          pricesGrid.innerHTML = '';
+          errorCard.style.display = 'block';
+        }
+      } finally {
+        setTimeout(() => refreshIcon.classList.remove('fa-spin'), 500);
+      }
+    };
+
+    const renderCards = (data, filterText = '') => {
+      if (!data) return;
+      pricesGrid.innerHTML = '';
+
+      // Determine the trending coin (highest positive 24h change)
+      let highestGain = -Infinity;
+      let trendingCoinId = null;
+      for (const [id, info] of Object.entries(data)) {
+        if (info.usd_24h_change > highestGain) {
+          highestGain = info.usd_24h_change;
+          trendingCoinId = id;
+        }
+      }
+
+      for (const [id, info] of Object.entries(data)) {
+        const meta = COIN_METADATA[id];
+        if (!meta) continue;
+
+        // Apply Search Filter
+        const searchTarget = `${meta.name.toLowerCase()} ${meta.ticker.toLowerCase()}`;
+        if (filterText && !searchTarget.includes(filterText.toLowerCase())) {
+          continue; // Skip card if it doesn't match
+        }
+
+        const price = formatPrice(info.usd);
+        const change = info.usd_24h_change;
+        const isUp = change >= 0;
+        const changeClass = isUp ? 'text-green' : 'text-red';
+        const changeIcon = isUp ? '▲' : '▼';
+        const borderColor = isUp ? '#50ff78' : '#ff5050';
+        const isTrending = id === trendingCoinId && change > 0;
+
+        const cardHTML = `
+          <div class="glass-panel price-card" style="border-bottom-color: ${borderColor}; --glow-blue: 0 0 20px ${borderColor}80;">
+            ${isTrending ? '<div class="trending-badge">🔥 Trending</div>' : ''}
+            <img src="${meta.img}" alt="${meta.name}" class="coin-logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/3/36/Unknown_logo.svg'">
+            <h3 style="margin-bottom: 0;">${meta.name} — ${meta.ticker}</h3>
+            <div class="coin-price">${price}</div>
+            <div class="coin-change ${changeClass}">
+              ${changeIcon} ${Math.abs(change).toFixed(2)}%
+            </div>
+          </div>
+        `;
+        pricesGrid.insertAdjacentHTML('beforeend', cardHTML);
+      }
+
+      if (pricesGrid.children.length === 0) {
+        pricesGrid.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: rgba(232, 244, 253, 0.6);">No coins match your search.</p>`;
+      }
+      
+      // Re-bind cursor listeners dynamically generated after API responses mapping interactives
+      if (window.requeryCursor) window.requeryCursor();
+    };
+
+    const resetTimer = () => {
+      timerSeconds = 60;
+      autoRefreshTimer.textContent = `Auto-refresh in: ${timerSeconds}s`;
+      clearInterval(countdownInterval);
+      countdownInterval = setInterval(() => {
+        timerSeconds--;
+        if (timerSeconds <= 0) {
+          fetchPrices();
+        } else {
+          autoRefreshTimer.textContent = `Auto-refresh in: ${timerSeconds}s`;
+        }
+      }, 1000);
+    };
+
+    // Event Listeners
+    refreshBtn.addEventListener('click', fetchPrices);
+    
+    searchInput.addEventListener('input', (e) => {
+      renderCards(currentData, e.target.value);
+    });
+
+    // Initial Load
+    fetchPrices();
+
+  </script>
+  <script src="cursor.js"></script>
+</body>
+</html>

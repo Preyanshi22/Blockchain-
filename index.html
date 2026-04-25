@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArbiLearn | Premium Web3 Experience</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="page-transition">
+
+  <main class="container">
+    <!-- HERO SECTION -->
+    <section>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4rem; margin-top: 4rem;">
+        
+        <!-- Left Side -->
+        <div style="flex: 1; min-width: 300px;" class="slide-right visible">
+          <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(40,160,240,0.1); border: 1px solid var(--arb-blue); padding: 6px 16px; border-radius: 50px; font-size: 0.85rem; font-weight: 600; color: var(--arb-cyan); margin-bottom: 1.5rem; box-shadow: inset 0 0 10px rgba(40,160,240,0.2);">
+            <div style="width: 8px; height: 8px; background: var(--arb-cyan); border-radius: 50%; box-shadow: var(--glow-cyan); animation: ripple-anim 2s infinite alternate;"></div>
+            Built on Arbitrum One
+          </div>
+          
+          <h1 class="text-gradient" style="margin-bottom: 1.5rem;">The Future of Ethereum is Layer 2</h1>
+          
+          <p style="font-size: 1.15rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 2.5rem; max-width: 550px;">
+            Scaling solutions shouldn't be complicated. Experience the raw speed, minimal fees, and cryptographic security of the world's most adopted optimistic rollup.
+          </p>
+          
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem;">
+            <a href="concepts.html" class="btn btn-primary trans-link">Explore Concepts <i class="fa-solid fa-arrow-right"></i></a>
+            <a href="prices.html" class="btn btn-secondary trans-link">Live Markets <i class="fa-solid fa-chart-line"></i></a>
+          </div>
+
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <div style="background: rgba(255,255,255,0.05); padding: 8px 16px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.8rem; font-weight: 600;">🔐 Trustless</div>
+            <div style="background: rgba(255,255,255,0.05); padding: 8px 16px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.8rem; font-weight: 600;">⚡ 40,000 TPS</div>
+            <div style="background: rgba(255,255,255,0.05); padding: 8px 16px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.8rem; font-weight: 600;">💰 $0.01 Fees</div>
+          </div>
+        </div>
+
+        <!-- Right Side: SVG Diagram -->
+        <div style="flex: 1; min-width: 300px; display: flex; justify-content: center;" class="scroll-reveal visible">
+          <div class="flow-diagram-container">
+            <svg viewBox="0 0 400 250" class="flow-svg">
+              <defs>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="var(--arb-purple)" stop-opacity="0.8" />
+                  <stop offset="100%" stop-color="var(--arb-blue)" stop-opacity="0.8" />
+                </linearGradient>
+              </defs>
+              
+              <rect x="25" y="85" width="110" height="80" rx="16" fill="rgba(123,47,190,0.15)" stroke="var(--arb-purple)" stroke-width="2"/>
+              <text x="80" y="125" fill="white" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="14">Ethereum</text>
+              <text x="80" y="145" fill="var(--arb-purple)" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600">L1 Base</text>
+              
+              <rect x="265" y="85" width="110" height="80" rx="16" fill="rgba(40,160,240,0.15)" stroke="var(--arb-blue)" stroke-width="2"/>
+              <text x="320" y="125" fill="white" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="14">Arbitrum</text>
+              <text x="320" y="145" fill="var(--arb-cyan)" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600">L2 Scale</text>
+              
+              <path id="bridgeUp" d="M 135 110 Q 200 40 265 110" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="8 6"/>
+              <path id="bridgeDown" d="M 265 140 Q 200 210 135 140" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="8 6"/>
+              
+              <circle cx="0" cy="0" r="6" fill="var(--arb-cyan)">
+                <animateMotion dur="2s" repeatCount="indefinite" path="M 135 110 Q 200 40 265 110"/>
+              </circle>
+              <circle cx="0" cy="0" r="6" fill="var(--arb-purple)">
+                <animateMotion dur="2s" repeatCount="indefinite" path="M 265 140 Q 200 210 135 140"/>
+              </circle>
+              
+              <text id="confirmTxt" x="320" y="185" fill="var(--arb-green)" text-anchor="middle" font-family="Inter" font-size="12" font-weight="bold">
+                ✓ Confirmed
+                <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+              </text>
+            </svg>
+          </div>
+        </div>
+
+      </div>
+      
+      <!-- Bouncing Arrow -->
+      <div style="text-align: center; margin-top: 4rem;">
+        <i class="fa-solid fa-chevron-down" style="color: var(--arb-cyan); font-size: 1.5rem; animation: bounce 2s infinite;"></i>
+      </div>
+    </section>
+
+    <!-- STATS BAR -->
+    <section class="scroll-reveal">
+      <div class="glass-card stats-bar" style="border-radius: 20px; padding: 2.5rem; display: flex; justify-content: space-around; flex-wrap: wrap;">
+        <div class="stat-counter">
+          <i class="fa-solid fa-bolt" style="color: var(--arb-cyan); font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+          <div class="stat-val" data-target="40000" data-suffix="+">0</div>
+          <div class="stat-label">TPS Capacity</div>
+        </div>
+        <div class="stat-counter">
+          <i class="fa-solid fa-gas-pump" style="color: var(--arb-blue); font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+          <div class="stat-val" data-target="0.05" data-prefix="$">0</div>
+          <div class="stat-label">Avg Tx Cost</div>
+        </div>
+        <div class="stat-counter">
+          <i class="fa-solid fa-server" style="color: var(--arb-purple); font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+          <div class="stat-val" data-target="99.9" data-suffix="%">0</div>
+          <div class="stat-label">Uptime</div>
+        </div>
+        <div class="stat-counter">
+          <i class="fa-solid fa-globe" style="color: var(--arb-green); font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+          <div class="stat-val" data-target="500" data-suffix="M+">0</div>
+          <div class="stat-label">Transactions</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY L2 TIMELINE -->
+    <section>
+      <h2 class="text-gradient slide-right" style="text-align: center;">The Road to Scaling</h2>
+      <p class="scroll-reveal" style="text-align: center; color: var(--text-muted); margin-bottom: 3rem;">Why Ethereum fundamentally required a Layer 2 intervention.</p>
+      
+      <div class="timeline-container">
+        <div class="timeline-item scroll-reveal">
+          <div class="glass-card">
+            <h3 style="color: var(--arb-red); margin-bottom: 1rem;"><i class="fa-solid fa-snail"></i> Network Congestion</h3>
+            <p>During massive NFT mints or volatile bull runs, Ethereum's 15 TPS block limits are fundamentally saturated. In 2017, just one dApp severely choked the entire global ledger.</p>
+          </div>
+        </div>
+        <div class="timeline-item scroll-reveal">
+          <div class="glass-card">
+            <h3 style="color: #ffaa50; margin-bottom: 1rem;"><i class="fa-solid fa-money-bill-wave"></i> The Gas Fee Crisis</h3>
+            <p>High demand bids up block inclusion. Ordinary users faced $200 fees just to swap small tokens. Decentralized finance became a playground restricted strictly to whales.</p>
+          </div>
+        </div>
+        <div class="timeline-item scroll-reveal">
+          <div class="glass-card">
+            <h3 style="color: var(--arb-cyan); margin-bottom: 1rem;"><i class="fa-solid fa-chart-line"></i> The Scalability Wall</h3>
+            <p>A global financial system physically cannot operate entirely natively on a single layer. Visa handles 24,000 TPS. Rollups became the only mathematically sound solution.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE ROLLUP EXPLAINER -->
+    <section>
+      <div class="glass-card rollup-container scroll-reveal">
+        <h2 class="text-gradient" style="margin-bottom: 0.5rem;">Interactive Optimistic Rollup</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">Watch how Arbitrum processes transactions behind the scenes.</p>
+        
+        <div class="rollup-stage" id="ru-stage">
+          <div class="ru-tx" id="ru-tx1" style="left: 10%; top: 40%;"></div>
+          <div class="ru-tx" id="ru-tx2" style="left: 15%; top: 60%;"></div>
+          <div class="ru-tx" id="ru-tx3" style="left: 20%; top: 30%;"></div>
+          <div class="ru-bundle" id="ru-bundle" style="left: 45%; top: 25%;">Compressed Bundle</div>
+          <div class="ru-eth" id="ru-eth" style="right: 5%; top: 10%; height: 160px; width: 100px; display: flex; align-items: center; justify-content: center; font-weight: bold; writing-mode: vertical-rl;">Ethereum L1</div>
+        </div>
+        
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+          <button class="btn btn-secondary" onclick="rollupStep(1)">1. Users Send Txs</button>
+          <button class="btn btn-secondary" onclick="rollupStep(2)">2. Batch & Compress</button>
+          <button class="btn btn-secondary" onclick="rollupStep(3)">3. Post to L1 Proof</button>
+          <button class="btn btn-danger" onclick="rollupStep(0)"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+        </div>
+        
+        <p id="ru-desc" style="margin-top: 2rem; font-family: 'JetBrains Mono', monospace; color: var(--arb-cyan); height: 40px;"></p>
+      </div>
+    </section>
+
+    <!-- COMPARISON TABLE -->
+    <section>
+      <h2 class="text-gradient slide-right">Raw Performance Metrics</h2>
+      <table class="competitor-table scroll-reveal">
+        <thead>
+          <tr>
+            <th>Feature Matrix</th>
+            <th>Ethereum Mainnet</th>
+            <th>Arbitrum One</th>
+            <th>Winner</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="scroll-reveal">
+            <td>Avg Gas Transfer</td>
+            <td class="table-mainnet">~$10 – $50</td>
+            <td class="table-arbitrum">~$0.05</td>
+            <td><i class="fa-solid fa-trophy" style="color: #ffd700;"></i></td>
+          </tr>
+          <tr class="scroll-reveal">
+            <td>Transactions Per Second</td>
+            <td class="table-mainnet">~ 15 TPS</td>
+            <td class="table-arbitrum">Unlimited (40k+)</td>
+            <td><i class="fa-solid fa-trophy" style="color: #ffd700;"></i></td>
+          </tr>
+          <tr class="scroll-reveal">
+            <td>Confirmation Finality</td>
+            <td class="table-mainnet">12 seconds</td>
+            <td class="table-arbitrum">1 second</td>
+            <td><i class="fa-solid fa-trophy" style="color: #ffd700;"></i></td>
+          </tr>
+          <tr class="scroll-reveal">
+            <td>Solidity / EVM</td>
+            <td>Native Level 1</td>
+            <td class="table-arbitrum">Fully Compatible</td>
+            <td>Tie</td>
+          </tr>
+          <tr class="scroll-reveal">
+            <td>Underlying Security</td>
+            <td>Highest Global Security</td>
+            <td class="table-arbitrum">Inherits L1 completely</td>
+            <td>Tie</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="navbar.js"></script>
+  <script>
+    loadLayout('home');
+
+    // Bounce interaction CSS
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
+    `;
+    document.head.appendChild(style);
+
+    // Rollup logic
+    const t1 = document.getElementById('ru-tx1');
+    const t2 = document.getElementById('ru-tx2');
+    const t3 = document.getElementById('ru-tx3');
+    const bun = document.getElementById('ru-bundle');
+    const desc = document.getElementById('ru-desc');
+
+    function rollupStep(step) {
+      if (step === 0) {
+        t1.style.cssText = 'left: 10%; top: 40%; opacity: 0; transform: scale(1);';
+        t2.style.cssText = 'left: 15%; top: 60%; opacity: 0; transform: scale(1);';
+        t3.style.cssText = 'left: 20%; top: 30%; opacity: 0; transform: scale(1);';
+        bun.style.cssText = 'left: 45%; top: 25%; opacity: 0; transform: scale(1); box-shadow: var(--glow-purple);';
+        desc.innerHTML = '';
+      }
+      else if (step === 1) {
+        t1.style.opacity = '1'; t2.style.opacity = '1'; t3.style.opacity = '1';
+        desc.innerHTML = '> Network nodes receive thousands of raw pending transactions instantly...';
+      }
+      else if (step === 2) {
+        t1.style.cssText = 'left: 45%; top: 45%; opacity: 0; transform: scale(0.2);';
+        t2.style.cssText = 'left: 45%; top: 45%; opacity: 0; transform: scale(0.2);';
+        t3.style.cssText = 'left: 45%; top: 45%; opacity: 0; transform: scale(0.2);';
+        setTimeout(() => bun.style.opacity = '1', 400);
+        desc.innerHTML = '> Sequencer tightly zips and compresses all data off-chain into one batch...';
+      }
+      else if (step === 3) {
+        bun.style.cssText = 'left: 80%; top: 50%; opacity: 1; transform: scale(0.5); box-shadow: var(--glow-blue);';
+        desc.innerHTML = '> Bundle posted explicitly to Ethereum L1 mainnet. Inherits full security!';
+      }
+    }
+  </script>
+  <script src="cursor.js"></script>
+</body>
+</html>

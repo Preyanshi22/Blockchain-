@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArbiLearn | Fundamental Concepts</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="page-transition">
+
+  <main class="container">
+    <section>
+      <div style="text-align: center; margin-bottom: 4rem;">
+        <h1 class="text-gradient slide-right">Core Web3 Dynamics</h1>
+        <p class="scroll-reveal" style="color: var(--text-muted); font-size: 1.15rem;">The philosophical and technical building blocks defining decentralization.</p>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-bar scroll-reveal">
+        <button class="filter-pill active" onclick="filterCards('all')">All</button>
+        <button class="filter-pill" onclick="filterCards('identity')">Identity</button>
+        <button class="filter-pill" onclick="filterCards('infrastructure')">Infrastructure</button>
+      </div>
+
+      <!-- Flip Cards Grid -->
+      <div class="flip-grid">
+        
+        <!-- CARD 1 -->
+        <div class="flip-card scroll-reveal" data-cat="infrastructure">
+          <div class="flip-inner" id="flip-1">
+            
+            <!-- Front -->
+            <div class="flip-front">
+              <i class="fa-solid fa-server"></i>
+              <h2>Web2 vs Web3</h2>
+              <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Who actually owns your data?</p>
+              <button class="btn btn-secondary" onclick="flipNode('flip-1', true)">See Comparison <i class="fa-solid fa-arrow-right-arrow-left"></i></button>
+            </div>
+            
+            <!-- Back -->
+            <div class="flip-back">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 class="text-gradient">Architectural Shift</h3>
+                <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.8rem;" onclick="flipNode('flip-1', false)"><i class="fa-solid fa-rotate-left"></i> Flip Back</button>
+              </div>
+              <div class="flip-back-grid">
+                <div class="flip-back-col">
+                  <h4 style="color: var(--arb-red); margin-bottom: 1rem;"><i class="fa-solid fa-building"></i> Web2</h4>
+                  <p>Companies permanently own your core data frames.</p>
+                  <p>Accounts can be suspended arbitrarily.</p>
+                  <p>Strictly requires trust in centralized governance.</p>
+                  <p>Single points of failure risk.</p>
+                </div>
+                <div class="flip-back-col">
+                  <h4 style="color: var(--arb-green); margin-bottom: 1rem;"><i class="fa-solid fa-globe"></i> Web3</h4>
+                  <p>You inherently own your data via cryptography.</p>
+                  <p>Fundamentally censorship-resistant networks.</p>
+                  <p>Trustless. Math enforces execution locally.</p>
+                  <p>Decentralized globally distributed node operations.</p>
+                </div>
+              </div>
+              <div class="back-insight">💡 Key Insight: In Web3, your wallet IS your identity.</div>
+            </div>
+            
+          </div>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="flip-card scroll-reveal" data-cat="infrastructure">
+          <div class="flip-inner" id="flip-2">
+            
+            <div class="flip-front">
+              <div style="display: flex; justify-content: center; gap: 1rem;">
+                <i class="fa-brands fa-bitcoin"></i><i class="fa-brands fa-ethereum" style="color: var(--arb-purple);"></i>
+              </div>
+              <h2>Ethereum vs Bitcoin</h2>
+              <p style="color: var(--text-muted); margin-bottom: 1.5rem;">The Gold versus The Computer.</p>
+              <button class="btn btn-secondary" onclick="flipNode('flip-2', true)">See Comparison <i class="fa-solid fa-arrow-right-arrow-left"></i></button>
+            </div>
+            
+            <div class="flip-back">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 class="text-gradient">Network Typology</h3>
+                <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.8rem;" onclick="flipNode('flip-2', false)"><i class="fa-solid fa-rotate-left"></i> Flip Back</button>
+              </div>
+              <div class="flip-back-grid">
+                <div class="flip-back-col">
+                  <h4 style="color: #f7931a; margin-bottom: 1rem;">Bitcoin (₿)</h4>
+                  <p>Digital Gold. Premier global store of value.</p>
+                  <p>Strictly ~7 TPS. Proof of Work (PoW).</p>
+                  <p>Very limited primitive scripting support.</p>
+                  <p>Capped emission: strictly 21M coins.</p>
+                </div>
+                <div class="flip-back-col">
+                  <h4 style="color: #627eea; margin-bottom: 1rem;">Ethereum (♦)</h4>
+                  <p>Programmable Money. World supercomputer.</p>
+                  <p>High throughput via rollups. Proof of Stake (PoS).</p>
+                  <p>Turing-complete smart contract deployments.</p>
+                  <p>Powers the entirety of modern DeFi & DAOs.</p>
+                </div>
+              </div>
+              <div class="back-insight">💡 Key Insight: Bitcoin is a currency. Ethereum is an operating system.</div>
+            </div>
+            
+          </div>
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="flip-card scroll-reveal" data-cat="identity">
+          <div class="flip-inner" id="flip-3">
+            
+            <div class="flip-front">
+              <i class="fa-solid fa-user-lock"></i>
+              <h2>Public vs Private Keys</h2>
+              <p style="color: var(--text-muted); margin-bottom: 1.5rem;">How cryptographic possession physically works.</p>
+              <button class="btn btn-secondary" onclick="flipNode('flip-3', true)">See Comparison <i class="fa-solid fa-arrow-right-arrow-left"></i></button>
+            </div>
+            
+            <div class="flip-back">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 class="text-gradient">Cryptography</h3>
+                <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.8rem;" onclick="flipNode('flip-3', false)"><i class="fa-solid fa-rotate-left"></i> Flip Back</button>
+              </div>
+              <div class="flip-back-grid">
+                <div class="flip-back-col">
+                  <h4 style="color: var(--arb-green); margin-bottom: 1rem;"><i class="fa-solid fa-unlock"></i> Public Key</h4>
+                  <p>Serves as your raw blockchain identifier.</p>
+                  <p>100% safe to disseminate publicly.</p>
+                  <p>Acts functionally like your bank account routing number.</p>
+                </div>
+                <div class="flip-back-col">
+                  <h4 style="color: var(--arb-red); margin-bottom: 1rem;"><i class="fa-solid fa-key"></i> Private Key</h4>
+                  <p>Massive 256-bit arbitrary mathematical coordinate.</p>
+                  <p>Mathematically signs every outgoing transaction.</p>
+                  <div style="border: 1px solid var(--arb-red); background: rgba(255,69,96,0.1); padding: 8px; border-radius: 6px; font-size: 0.8rem; margin-top: 1rem; color: #ffb3b3; animation: bounce 4s infinite;">
+                    🚨 <strong>WARNING:</strong> Never share your private key. Not even with support. If exposed, funds drain instantly.
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+        <!-- CARD 4 -->
+        <div class="flip-card scroll-reveal" data-cat="infrastructure">
+          <div class="flip-inner" id="flip-4">
+            
+            <div class="flip-front">
+              <i class="fa-solid fa-database"></i>
+              <h2>Chain vs Database</h2>
+              <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Why not just use Postgres?</p>
+              <button class="btn btn-secondary" onclick="flipNode('flip-4', true)">See Comparison <i class="fa-solid fa-arrow-right-arrow-left"></i></button>
+            </div>
+            
+            <div class="flip-back">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 class="text-gradient">Data Storage Typology</h3>
+                <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.8rem;" onclick="flipNode('flip-4', false)"><i class="fa-solid fa-rotate-left"></i> Flip Back</button>
+              </div>
+              <div class="flip-back-grid">
+                <div class="flip-back-col">
+                  <h4 style="color: var(--arb-cyan); margin-bottom: 1rem;">Traditional Database</h4>
+                  <p>Dictated violently by a singular central sysadmin.</p>
+                  <p>Can freely delete, redact, or rewrite history.</p>
+                  <p>Extremely fast high-frequency reads/writes.</p>
+                  <p>Relies heavily on trusted third-party security.</p>
+                </div>
+                <div class="flip-back-col">
+                  <h4 style="color: var(--arb-purple); margin-bottom: 1rem;">Blockchain Ledger</h4>
+                  <p>No administrator physically exists.</p>
+                  <p>Immutable append-only chronological sequences.</p>
+                  <p>Slower throughput but objectively verifiable.</p>
+                  <p>Trustless execution enforced via consensus algorithms.</p>
+                </div>
+              </div>
+              <div class="back-insight">💡 Key Insight: A blockchain trades speed and scale for absolute trust framework elimination.</div>
+            </div>
+            
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <script src="navbar.js"></script>
+  <script>
+    loadLayout('concepts');
+
+    // Handle Flips
+    function flipNode(id, direction) {
+      const card = document.getElementById(id).closest('.flip-card');
+      if (direction) card.classList.add('flipped');
+      else card.classList.remove('flipped');
+    }
+
+    // Handle filtering visually
+    function filterCards(cat) {
+      // Update pills
+      document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      // Filter logic mapped to heights and scales
+      document.querySelectorAll('.flip-card').forEach(card => {
+        if(cat === 'all' || card.dataset.cat === cat) {
+          card.style.display = 'block';
+          setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'scale(1)'; }, 50);
+        } else {
+          card.style.opacity = '0';
+          card.style.transform = 'scale(0.95)';
+          setTimeout(() => card.style.display = 'none', 350);
+        }
+      });
+    }
+  </script>
+  <script src="cursor.js"></script>
+</body>
+</html>
