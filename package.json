@@ -1,0 +1,32 @@
+{
+  "name": "blockchain-",
+  "version": "1.0.0",
+  "description": "![ArbiLearn Banner](https://raw.githubusercontent.com/ArbitrumFoundation/docs/HEAD/static/img/arbitrum-logo-dark.svg)",
+  "main": "cursor.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "vite"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Preyanshi22/Blockchain-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Preyanshi22/Blockchain-/issues"
+  },
+  "homepage": "https://github.com/Preyanshi22/Blockchain-#readme",
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "vite": "^6.0.0"
+  }
+}
