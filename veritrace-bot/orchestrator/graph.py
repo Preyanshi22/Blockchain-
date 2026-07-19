@@ -21,7 +21,7 @@ from dotenv import load_dotenv
 
 # Load .env from project root
 _project_root = os.path.join(os.path.dirname(__file__), '..')
-load_dotenv(os.path.join(_project_root, '.env'))
+load_dotenv(os.path.join(_project_root, '.env'), override=True)
 
 from langchain_core.tools import tool
 from langchain_core.messages import AIMessage
@@ -100,6 +100,7 @@ async def _load_mcp_tools():
 
 def _build_llm_with_tools(all_tools):
     """Create the ChatGoogleGenerativeAI model and bind all tools."""
+    load_dotenv(os.path.join(_project_root, '.env'), override=True)
     api_key = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv("GOOGLE_API_KEY", "").strip()
     if not api_key or api_key.startswith("your-"):
         raise RuntimeError(

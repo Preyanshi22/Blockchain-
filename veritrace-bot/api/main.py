@@ -17,7 +17,7 @@ if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
 
 from dotenv import load_dotenv
-load_dotenv(os.path.join(_project_root, '.env'))
+load_dotenv(os.path.join(_project_root, '.env'), override=True)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
