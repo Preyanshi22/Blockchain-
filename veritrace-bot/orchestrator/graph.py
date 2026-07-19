@@ -25,7 +25,7 @@ load_dotenv(os.path.join(_project_root, '.env'), override=True)
 
 from langchain_core.tools import tool
 from langchain_core.messages import AIMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langgraph.graph import StateGraph, MessagesState, END
 from langgraph.prebuilt import ToolNode
 from langgraph.checkpoint.memory import MemorySaver
@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
-MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
+MODEL_NAME = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 MAX_RETRIES = 3
 RETRY_BASE_DELAY = 1  # seconds
 
@@ -99,23 +99,16 @@ async def _load_mcp_tools():
 # ---------------------------------------------------------------------------
 
 def _build_llm_with_tools(all_tools):
-    """Create the ChatGoogleGenerativeAI model and bind all tools."""
+    """Create the ChatGroq model and bind all tools."""
     load_dotenv(os.path.join(_project_root, '.env'), override=True)
-    api_key = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv("GOOGLE_API_KEY", "").strip()
-    if not api_key or api_key.startswith("your-"):
-        raise RuntimeError(
-            "GEMINI_API_KEY / GOOGLE_API_KEY is not set or is still a placeholder. "
-            "Open veritrace-bot/.env and replace the value with your real "
-            "Gemini API key from https://aistudio.google.com/apikey"
-        )
-    # Set GOOGLE_API_KEY in environment so ChatGoogleGenerativeAI Pydantic validator succeeds
-    os.environ["GOOGLE_API_KEY"] = api_key
-    os.environ["GEMINI_API_KEY"] = api_key
+    groq_api_key = os.getenv("GROQ_API_KEY", "").strip()
+    if not groq_api_key:
+        raise RuntimeError("GROQ_API_KEY is missing from .env file.")
 
-    llm = ChatGoogleGenerativeAI(
-        model=MODEL_NAME,
-        api_key=api_key,
-        google_api_key=api_key,
+    llm = ChatGroq(
+        model_name=MODEL_NAME,
+        groq_api_key=groq_api_key,
+        temperature=0.2,
     )
     if all_tools:
         llm_with_tools = llm.bind_tools(all_tools)
