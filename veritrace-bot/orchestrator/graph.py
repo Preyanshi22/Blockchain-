@@ -100,15 +100,20 @@ async def _load_mcp_tools():
 
 def _build_llm_with_tools(all_tools):
     """Create the ChatGoogleGenerativeAI model and bind all tools."""
-    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    api_key = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv("GOOGLE_API_KEY", "").strip()
     if not api_key or api_key.startswith("your-"):
         raise RuntimeError(
-            "GEMINI_API_KEY is not set or is still a placeholder. "
+            "GEMINI_API_KEY / GOOGLE_API_KEY is not set or is still a placeholder. "
             "Open veritrace-bot/.env and replace the value with your real "
             "Gemini API key from https://aistudio.google.com/apikey"
         )
+    # Set GOOGLE_API_KEY in environment so ChatGoogleGenerativeAI Pydantic validator succeeds
+    os.environ["GOOGLE_API_KEY"] = api_key
+    os.environ["GEMINI_API_KEY"] = api_key
+
     llm = ChatGoogleGenerativeAI(
         model=MODEL_NAME,
+        api_key=api_key,
         google_api_key=api_key,
     )
     if all_tools:
